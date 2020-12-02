@@ -1,5 +1,7 @@
+import { Post } from './post.model';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {map} from 'rxjs/operators'
 
 @Component({
   selector: 'app-root',
@@ -11,12 +13,14 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fetchPosts();
+  }
 
-  onCreatePost(postData: { title: string; content: string }) {
+  onCreatePost(postData:Post) {
     // Send Http request
     this.http
-      .post(
+      .post<{name:string}>(
         'https://ng-complete-guide-c56d3.firebaseio.com/posts.json',
         postData
       )
@@ -27,9 +31,26 @@ export class AppComponent implements OnInit {
 
   onFetchPosts() {
     // Send Http request
+    this.fetchPosts
   }
 
   onClearPosts() {
     // Send Http request
+  }
+
+  private fetchPosts(){
+    this.http.get<{[key:string]: Post}>('https://ng-complete-guide-c56d3.firebaseio.com/posts.json')
+    .pipe(map((responseData:{[key:string]: Post})=>{
+      const postArray : Post[]= [];
+      for(const key in responseData){
+        if(responseData.hasOwnProperty(key)){
+          console.log(responseData[key]);
+        postArray.push({...responseData[key], id:key})
+      }
+      }
+    }))
+    .subscribe(posts=>{
+      console.log(posts[0]);
+    });
   }
 }
