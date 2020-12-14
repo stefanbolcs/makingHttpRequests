@@ -21,21 +21,27 @@ export class PostService {
   }
 
   fetchPosts() {
-    this.http
+    return this.http
       .get<{ [key: string]: Post }>(
         "https://ng-complete-guide-c56d3.firebaseio.com/posts.json"
       )
       .pipe(
-        map((responseData: { [key: string]: Post }) => {
+        map(responseData=> {
           const postArray: Post[] = [];
           for (const key in responseData) {
             if (responseData.hasOwnProperty(key)) {
-              console.log(responseData[key]);
+              
               postArray.push({ ...responseData[key], id: key });
             }
           }
+          return postArray;
         })
-      )
-      .subscribe((posts) => {});
+      ) ;
   }
+
+  deletePosts(){
+    return this.http.delete('https://ng-complete-guide-c56d3.firebaseio.com/posts.json');
+  }
+
+
 }
